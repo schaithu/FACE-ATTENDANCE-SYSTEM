@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Attendance System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 2rem;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 1rem;
+            background: #f0f0f0;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+            .tab-button.active {
+                background: #667eea;
+                color: white;
+            }
+
+        .tab-content {
+            display: none;
+        }
+
+            .tab-content.active {
+                display: block;
+            }
+
+        h2 {
+            color: #333;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: bold;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+            input[type="email"]:focus,
+            input[type="password"]:focus {
+                outline: none;
+                border-color: #667eea;
+            }
+
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 1rem;
+        }
+
+            .btn:hover {
+                background: #5a67d8;
+            }
+
+            .btn:disabled {
+                background: #ccc;
+                cursor: not-allowed;
+            }
+
+        .video-container {
+            margin: 1rem 0;
+            position: relative;
+        }
+
+        #webcam {
+            width: 100%;
+            max-width: 300px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .message {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Face Attendance System</h1>
+
+        <div class="tab-buttons">
+            <button class="tab-button active" data-tab="login">Login</button>
+            <button class="tab-button" data-tab="register">Register</button>
+            <button class="tab-button" data-tab="attendance">Face Attendance</button>
+        </div>
+
+        <!-- Login Tab -->
+        <div id="login" class="tab-content active">
+            <h2>Login</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email:</label>
+                    <input type="email" id="loginEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password:</label>
+                    <input type="password" id="loginPassword" name="password" required>
+                </div>
+                <button type="submit" class="btn">Login</button>
+            </form>
+        </div>
+
+        <!-- Register Tab -->
+        <div id="register" class="tab-content">
+            <h2>Register</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="registerEmail">Email:</label>
+                    <input type="email" id="registerEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Password:</label>
+                    <input type="password" id="registerPassword" name="password" required>
+                </div>
+                <button type="submit" class="btn">Register</button>
+            </form>
+        </div>
+
+        <!-- Face Attendance Tab -->
+        <div id="attendance" class="tab-content">
+            <h2>Face Attendance</h2>
+            <div class="video-container">
+                <video id="webcam" autoplay muted></video>
+                <canvas id="canvas" style="display: none;"></canvas>
+            </div>
+            <button id="startCamera" class="btn">Start Camera</button>
+            <button id="capturePhoto" class="btn hidden">Mark Attendance</button>
+            <button id="stopCamera" class="btn hidden">Stop Camera</button>
+        </div>
+
+        <!-- Message Area -->
+        <div id="message"></div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentUserId = null;
+        let stream = null;
+        const API_BASE = 'http://localhost:8080';
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('Page loaded successfully');
+            initializeTabButtons();
+            initializeForms();
+            initializeCameraButtons();
+        });
+
+        // Tab switching functionality - FIXED VERSION
+        function initializeTabButtons() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const tabName = this.getAttribute('data-tab');
+                    showTab(tabName);
+                });
+            });
+        }
+
+        function showTab(tabName) {
+            console.log('Switching to tab:', tabName);
+
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Show selected tab
+            const targetTab = document.getElementById(tabName);
+            if (targetTab) {
+                targetTab.classList.add('active');
+            }
+
+            // Add active class to clicked button
+            const activeButton = document.querySelector(`[data-tab="${tabName}"]`);
+            if (activeButton) {
+                activeButton.classList.add('active');
+            }
+        }
+
+        // Utility functions
+        function showMessage(text, type = 'success') {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = text;
+            messageDiv.className = `message ${type}`;
+        }
+
+        function clearMessage() {
+            document.getElementById('message').innerHTML = '';
+        }
+
+        // API call helper
+        async function apiCall(endpoint, method = 'GET', data = null) {
+            console.log(`Making API call: ${method} ${endpoint}`, data);
+
+            const options = {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            };
+
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, options);
+                const result = await response.json();
+                console.log('API Response:', result);
+                return result;
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
+        }
+
+        // Initialize form handlers
+        function initializeForms() {
+            // Login form
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    console.log('Login form submitted');
+                    clearMessage();
+
+                    const email = document.getElementById('loginEmail').value;
+                    const password = document.getElementById('loginPassword').value;
+
+                    console.log('Login attempt:', email);
+
+                    try {
+                        const result = await apiCall('/login', 'POST', { email, password });
+
+                        if (result.success) {
+                            currentUserId = result.user_id;
+                            showMessage(`Login successful! User ID: ${result.user_id}`, 'success');
+                            setTimeout(() => showTab('attendance'), 1000);
+                        } else {
+                            showMessage(result.message || 'Login failed', 'error');
+                        }
+                    } catch (error) {
+                        showMessage('Login error. Check if server is running.', 'error');
+                    }
+                });
+            }
+
+            // Register form
+            const registerForm = document.getElementById('registerForm');
+            if (registerForm) {
+                registerForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    console.log('Register form submitted');
+                    clearMessage();
+
+                    const email = document.getElementById('registerEmail').value;
+                    const password = document.getElementById('registerPassword').value;
+
+                    console.log('Registration attempt:', email);
+
+                    try {
+                        const result = await apiCall('/register', 'POST', { email, password });
+
+                        if (result.success) {
+                            showMessage('Registration successful! You can now login.', 'success');
+                            document.getElementById('registerForm').reset();
+                            setTimeout(() => showTab('login'), 2000);
+                        } else {
+                            showMessage(result.message || 'Registration failed', 'error');
+                        }
+                    } catch (error) {
+                        showMessage('Registration error. Check if server is running.', 'error');
+                    }
+                });
+            }
+        }
+
+        // Initialize camera buttons
+        function initializeCameraButtons() {
+            const startCameraBtn = document.getElementById('startCamera');
+            const stopCameraBtn = document.getElementById('stopCamera');
+            const capturePhotoBtn = document.getElementById('capturePhoto');
+
+            if (startCameraBtn) {
+                startCameraBtn.addEventListener('click', async () => {
+                    console.log('Start camera clicked');
+                    try {
+                        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                        const video = document.getElementById('webcam');
+                        video.srcObject = stream;
+
+                        startCameraBtn.classList.add('hidden');
+                        capturePhotoBtn.classList.remove('hidden');
+                        stopCameraBtn.classList.remove('hidden');
+
+                        showMessage('Camera started successfully!', 'success');
+                    } catch (error) {
+                        console.error('Camera error:', error);
+                        showMessage('Error accessing camera. Please check permissions.', 'error');
+                    }
+                });
+            }
+
+            if (stopCameraBtn) {
+                stopCameraBtn.addEventListener('click', () => {
+                    console.log('Stop camera clicked');
+                    if (stream) {
+                        stream.getTracks().forEach(track => track.stop());
+                        document.getElementById('webcam').srcObject = null;
+
+                        startCameraBtn.classList.remove('hidden');
+                        capturePhotoBtn.classList.add('hidden');
+                        stopCameraBtn.classList.add('hidden');
+
+                        showMessage('Camera stopped.', 'success');
+                    }
+                });
+            }
+
+            if (capturePhotoBtn) {
+                capturePhotoBtn.addEventListener('click', async () => {
+                    console.log('Capture photo clicked');
+
+                    if (!currentUserId) {
+                        showMessage('Please login first!', 'error');
+                        showTab('login');
+                        return;
+                    }
+
+                    const video = document.getElementById('webcam');
+                    const canvas = document.getElementById('canvas');
+                    const ctx = canvas.getContext('2d');
+
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    ctx.drawImage(video, 0, 0);
+
+                    const imageData = canvas.toDataURL('image/jpeg', 0.8);
+
+                    try {
+                        showMessage('<div class="loading"></div> Processing face verification...', 'success');
+
+                        const result = await apiCall('/verify-face', 'POST', {
+                            user_id: currentUserId,
+                            image: imageData
+                        });
+
+                        if (result.success) {
+                            showMessage(result.message, 'success');
+                        } else {
+                            showMessage(result.message || 'Face verification failed', 'error');
+                        }
+
+                    } catch (error) {
+                        showMessage('Face verification failed. Check if server is running.', 'error');
+                    }
+                });
+            }
+        }
+
+        // Check if camera is supported
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            document.addEventListener('DOMContentLoaded', function () {
+                document.getElementById('attendance').innerHTML =
+                    '<h2>Face Attendance</h2><p style="color: red;">Camera access is not supported in this browser.</p>';
+            });
+        }
+
+        console.log('JavaScript loaded successfully');
+    </script>
+</body>
+</html>

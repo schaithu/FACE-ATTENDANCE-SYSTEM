@@ -19,7 +19,34 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="C:\Users\ADMIN\Downloads\sqlite-amalgamation-3500400\sqlite-amalgamation-3500400\sqlite3.c" />
+    <ClCompile Include="C:\Users\ADMIN\Downloads\SQLiteCpp-master\SQLiteCpp-master\src\Backup.cpp" />
+    <ClCompile Include="C:\Users\ADMIN\Downloads\SQLiteCpp-master\SQLiteCpp-master\src\Column.cpp" />
+    <ClCompile Include="C:\Users\ADMIN\Downloads\SQLiteCpp-master\SQLiteCpp-master\src\Database.cpp" />
+    <ClCompile Include="C:\Users\ADMIN\Downloads\SQLiteCpp-master\SQLiteCpp-master\src\Exception.cpp" />
+    <ClCompile Include="C:\Users\ADMIN\Downloads\SQLiteCpp-master\SQLiteCpp-master\src\Savepoint.cpp" />
+    <ClCompile Include="C:\Users\ADMIN\Downloads\SQLiteCpp-master\SQLiteCpp-master\src\Statement.cpp" />
+    <ClCompile Include="C:\Users\ADMIN\Downloads\SQLiteCpp-master\SQLiteCpp-master\src\Transaction.cpp" />
     <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\ADMIN\Downloads\sqlite-amalgamation-3500400\sqlite-amalgamation-3500400\sqlite3.h" />
+    <ClInclude Include="C:\Users\ADMIN\Downloads\SQLiteCpp-master\SQLiteCpp-master\include\SQLiteCpp\Assertion.h" />
+    <ClInclude Include="C:\Users\ADMIN\Downloads\SQLiteCpp-master\SQLiteCpp-master\include\SQLiteCpp\Backup.h" />
+    <ClInclude Include="C:\Users\ADMIN\Downloads\SQLiteCpp-master\SQLiteCpp-master\include\SQLiteCpp\Column.h" />
+    <ClInclude Include="C:\Users\ADMIN\Downloads\SQLiteCpp-master\SQLiteCpp-master\include\SQLiteCpp\Database.h" />
+    <ClInclude Include="C:\Users\ADMIN\Downloads\SQLiteCpp-master\SQLiteCpp-master\include\SQLiteCpp\Exception.h" />
+    <ClInclude Include="C:\Users\ADMIN\Downloads\SQLiteCpp-master\SQLiteCpp-master\include\SQLiteCpp\ExecuteMany.h" />
+    <ClInclude Include="C:\Users\ADMIN\Downloads\SQLiteCpp-master\SQLiteCpp-master\include\SQLiteCpp\Savepoint.h" />
+    <ClInclude Include="C:\Users\ADMIN\Downloads\SQLiteCpp-master\SQLiteCpp-master\include\SQLiteCpp\SQLiteCpp.h" />
+    <ClInclude Include="C:\Users\ADMIN\Downloads\SQLiteCpp-master\SQLiteCpp-master\include\SQLiteCpp\SQLiteCppExport.h" />
+    <ClInclude Include="C:\Users\ADMIN\Downloads\SQLiteCpp-master\SQLiteCpp-master\include\SQLiteCpp\Statement.h" />
+    <ClInclude Include="C:\Users\ADMIN\Downloads\SQLiteCpp-master\SQLiteCpp-master\include\SQLiteCpp\Transaction.h" />
+    <ClInclude Include="C:\Users\ADMIN\Downloads\SQLiteCpp-master\SQLiteCpp-master\include\SQLiteCpp\Utils.h" />
+    <ClInclude Include="C:\Users\ADMIN\Downloads\SQLiteCpp-master\SQLiteCpp-master\include\SQLiteCpp\VariadicBind.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="frontend.html" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -109,6 +136,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir);C:\Users\ADMIN\Downloads\asio-1.34.2\asio-1.34.2\include;C:\Users\ADMIN\Downloads\SQLiteCpp-master\SQLiteCpp-master\sqlite3;C:\Users\ADMIN\Downloads\SQLiteCpp-master\SQLiteCpp-master\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
