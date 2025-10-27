@@ -3,22 +3,23 @@
 #include <iostream>
 #include <string>
 #include <fstream> 
+using namespace std;
 
 // Dummy sha256 function (replace with real one later)
-std::string sha256(const std::string& input) {
+string sha256(const string& input) {
     return input; // Just returns input for now
 }
 
 // Function to read HTML file
-std::string readHTMLFile(const std::string& filename) {
-    std::ifstream file(filename);
+string readHTMLFile(const string& filename) {
+    ifstream file(filename);
     if (!file.is_open()) {
         return "<html><body><h1>Frontend file not found. Please copy your frontend.html to index.html in the same folder as your exe file.</h1></body></html>";
     }
 
-    std::string content;
-    std::string line;
-    while (std::getline(file, line)) {
+    string content;
+    string line;
+    while (getline(file, line)) {
         content += line + "\n";
     }
     file.close();
@@ -52,7 +53,7 @@ int main() {
 
         // CORS for all other routes
         CROW_ROUTE(app, "/<path>").methods("OPTIONS"_method)
-            ([](const std::string& path) {
+            ([](const string& path) {
             crow::response res;
             res.add_header("Access-Control-Allow-Origin", "*");
             res.add_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
@@ -62,7 +63,7 @@ int main() {
 
         // Root route - serve the frontend HTML
         CROW_ROUTE(app, "/")([]() {
-            std::string html_content = readHTMLFile("index.html");
+            string html_content = readHTMLFile("index.html");
             crow::response res(html_content);
             res.add_header("Content-Type", "text/html");
             return res;
@@ -70,7 +71,7 @@ int main() {
 
         // Serve index.html explicitly
         CROW_ROUTE(app, "/index.html")([]() {
-            std::string html_content = readHTMLFile("index.html");
+            string html_content = readHTMLFile("index.html");
             crow::response res(html_content);
             res.add_header("Content-Type", "text/html");
             return res;
@@ -95,9 +96,9 @@ int main() {
                 return res;
             }
 
-            std::string email = input["email"].s();
-            std::string password = input["password"].s();
-            std::string password_hash = sha256(password);
+            string email = input["email"].s();
+            string password = input["password"].s();
+            string password_hash = sha256(password);
 
             try {
                 SQLite::Statement query(db, "SELECT id FROM users WHERE email = ? AND password_hash = ?;");
@@ -121,7 +122,7 @@ int main() {
                 return res;
 
             }
-            catch (const std::exception& e) {
+            catch (const exception& e) {
                 crow::json::wvalue res_json;
                 res_json["success"] = false;
                 res_json["message"] = e.what();
@@ -143,9 +144,9 @@ int main() {
                 return res;
             }
 
-            std::string email = input["email"].s();
-            std::string password = input["password"].s();
-            std::string password_hash = sha256(password);
+            string email = input["email"].s();
+            string password = input["password"].s();
+            string password_hash = sha256(password);
 
             try {
                 SQLite::Statement query(db, "INSERT INTO users (email, password_hash) VALUES (?, ?);");
@@ -163,7 +164,7 @@ int main() {
                 return res;
 
             }
-            catch (const std::exception& e) {
+            catch (const exception& e) {
                 crow::json::wvalue res_json;
                 res_json["success"] = false;
                 res_json["message"] = e.what();
@@ -205,7 +206,7 @@ int main() {
                 return res;
 
             }
-            catch (const std::exception& e) {
+            catch (const exception& e) {
                 crow::json::wvalue res_json;
                 res_json["success"] = false;
                 res_json["message"] = e.what();
@@ -218,20 +219,20 @@ int main() {
                 });
 
         // Start server
-        std::cout << "Starting Face Attendance System server at http://localhost:8080" << std::endl;
-        std::cout << "Available endpoints:" << std::endl;
-        std::cout << "  GET  / - Frontend interface" << std::endl;
-        std::cout << "  GET  /status - API status" << std::endl;
-        std::cout << "  POST /login - User login" << std::endl;
-        std::cout << "  POST /register - User registration" << std::endl;
-        std::cout << "  POST /verify-face - Face verification" << std::endl;
-        std::cout << "\nIMPORTANT: Copy your frontend.html to index.html in the same folder!" << std::endl;
+        cout << "Starting Face Attendance System server at http://localhost:8080" << endl;
+        cout << "Available endpoints:" << endl;
+        cout << "  GET  / - Frontend interface" << endl;
+        cout << "  GET  /status - API status" << endl;
+        cout << "  POST /login - User login" << endl;
+        cout << "  POST /register - User registration" << endl;
+        cout << "  POST /verify-face - Face verification" << endl;
+        cout << "\nIMPORTANT: Copy your frontend.html to index.html in the same folder!" << endl;
 
         app.port(8080).multithreaded().run();
 
     }
-    catch (const std::exception& e) {
-        std::cerr << "Exception: " << e.what() << std::endl;
+    catch (const exception& e) {
+        cerr << "Exception: " << e.what() << endl;
     }
 
     return 0;
